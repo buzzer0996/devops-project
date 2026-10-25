@@ -1,0 +1,15 @@
+# Terraform local files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+
+# Sensitive local files
+*.pem
+*.key
+
+# Local variable files
+*.tfvars
+*.tfvars.json
