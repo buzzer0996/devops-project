@@ -417,3 +417,54 @@ cd ..
 ---
 
 This project demonstrates a local DevOps workflow combining infrastructure configuration, automated validation, monitoring, observability, availability testing, and version control.
+
+## 17. Cybersecurity Monitoring with Wazuh
+
+Wazuh is an open-source security monitoring platform that can extend this project beyond infrastructure metrics and service availability monitoring.
+
+While Prometheus and Grafana provide infrastructure observability, Wazuh can provide security event monitoring, endpoint security analysis, file integrity monitoring, and vulnerability detection capabilities.
+
+### 17.1. Architecture
+
+The planned security monitoring architecture consists of:
+
+- **Wazuh Manager:** Receives and analyzes security events reported by monitored endpoints.
+- **Wazuh Agent:** Runs on the Ubuntu Linux environment and collects configured endpoint security information.
+- **Wazuh Indexer:** Stores and indexes security events for searching and analysis.
+- **Wazuh Dashboard:** Provides a web interface for reviewing security alerts, events, and vulnerability information.
+
+The Wazuh server components and the Ubuntu agent must be configured to communicate with each other. Required network access and service ports must be configured deliberately.
+
+### 17.2. Planned Implementation
+
+The cybersecurity extension will be implemented as a separate stage of the project:
+
+1. Deploy a compatible Wazuh server environment.
+2. Install and register the Wazuh Agent on the Ubuntu environment.
+3. Configure secure communication between the agent and the Wazuh server.
+4. Verify that the endpoint is connected and reporting events.
+5. Review security alerts and available vulnerability information in the Wazuh Dashboard.
+6. Document the installation, configuration, and validation results.
+
+### 17.3. Relationship with the Monitoring Stack
+
+The security monitoring extension complements the existing monitoring components:
+
+| Component | Primary purpose |
+|---|---|
+| Prometheus | Collects infrastructure and service metrics |
+| Grafana | Visualizes metrics and monitoring results |
+| Node Exporter | Exposes Linux system metrics |
+| Blackbox Exporter | Tests web service availability |
+| Nginx | Provides the test web service |
+| Wazuh | Collects and analyzes endpoint security information |
+
+Wazuh does not replace Prometheus or Grafana. It adds security monitoring capabilities to the overall project.
+
+### 17.4. Security and Resource Considerations
+
+The Wazuh deployment must be sized according to the available CPU, memory, and storage resources. Its server components may require substantially more resources than the existing monitoring containers.
+
+The deployment method and network configuration will be selected during implementation. Wazuh is a planned extension and must not be considered installed or operational until its services and agent connectivity have been tested successfully.
+
+Do not commit private keys, credentials, tokens, or other secrets to the repository.
