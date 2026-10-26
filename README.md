@@ -278,7 +278,7 @@ The workflow checks Terraform formatting, initializes Terraform without configur
 
 This provides an automated check of the Terraform configuration when the workflow is triggered by repository changes.
 
-## 10. Prometheus Configuration
+## 11. Prometheus Configuration
 
 The Prometheus configuration is located at:
 
@@ -294,7 +294,7 @@ The global scrape interval is 15 seconds.
 
 Open `http://localhost:9090/targets` to inspect the status of configured targets.
 
-## 11. Grafana Dashboard
+## 12. Grafana Dashboard
 
 Grafana is available at `http://localhost:3001`.
 
@@ -343,7 +343,7 @@ probe_success{job="nginx-blackbox"}
 
 A `probe_success` value of `1` means the probe succeeded; `0` means it failed.
 
-## 12. Availability and Recovery Test
+## 13. Availability and Recovery Test
 
 The Nginx availability test verifies that monitoring detects an outage and observes recovery.
 
@@ -358,7 +358,7 @@ Test procedure:
 
 The test was completed successfully: the probe changed from `1` to `0` during the outage and returned to `1` after Nginx restarted.
 
-## 13. Security and Repository Hygiene
+## 14. Security and Repository Hygiene
 
 The `.gitignore` file excludes common local Terraform state files, private keys, and local variable files.
 
@@ -370,7 +370,7 @@ Security practices for this project include:
 - Use test credentials only in the intended local testing environment.
 - Review changes before committing and pushing them to GitHub.
 
-## 14. Environment Limitations
+## 15. Environment Limitations
 
 - The project runs in a local simulation and does not represent a deployment to real AWS infrastructure.
 - Service URLs use localhost and are intended for local access.
@@ -378,7 +378,7 @@ Security practices for this project include:
 - The simulated Linux environment does not run a normal `systemd` process. Services started manually may need to be restarted if the environment is recreated.
 - Monitoring data collection depends on Docker, the local environment, the monitored services, and the required tunnels being available.
 
-## 15. Useful Commands
+## 16. Useful Commands
 
 From the repository root:
 
