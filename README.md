@@ -111,6 +111,103 @@ docker compose -f monitoring/docker-compose.yml down
 
 The standard `down` command preserves named data volumes. Avoid adding `-v` unless you intentionally want to remove the stored Prometheus and Grafana data.
 
+## 6. Local AWS Environment and EC2 Infrastructure
+
+The project uses a local AWS-compatible environment to simulate infrastructure resources and provide a Linux environment for the monitoring components. It is intended for development and testing rather than deployment to a public AWS account.
+
+### 6.1. Start and Verify the Local Environment
+
+The local AWS-compatible API is expected to be available at:
+
+`http://localhost:4566`
+
+Check the running Docker containers:
+
+```bash
+docker ps
+```
+
+Verify that the local AWS-compatible API is reachable:
+
+```bash
+curl http://localhost:4566
+```
+
+The exact response depends on the emulator and the endpoint being queried.
+
+### 6.2. EC2 Networking Resources
+
+The EC2 networking configuration consists of the following AWS resources:
+
+- **VPC:** Provides the virtual network boundary for the simulated EC2 environment.
+- **Subnet:** Defines an IP address range within the VPC where the instance can be placed.
+- **Security Group:** Defines the permitted inbound and outbound traffic for the instance.
+- **EC2 Instance:** Represents the Linux environment used to host the monitored services.
+
+These resources must be configured consistently so that the instance is associated with the intended network and security group.
+
+### 6.3. Create and Inspect Networking Resources
+
+The following AWS CLI commands illustrate the resource-creation workflow for an AWS-compatible local endpoint. They are examples and should only be used if the corresponding resources have not already been created.
+
+Create a VPC:
+
+```bash
+aws --endpoint-url http://localhost:4566 ec2 create-vpc \
+  --cidr-block 10.0.0.0/16
+```
+
+Create a subnet using the returned VPC ID:
+
+```bash
+aws --endpoint-url http://localhost:4566 ec2 create-subnet \
+  --vpc-id <VPC_ID> \
+  --cidr-block 10.0.1.0/24
+```
+
+Create a security group:
+
+```bash
+aws --endpoint-url http://localhost:4566 ec2 create-security-group \
+  --group-name devops-monitoring-sg \
+  --description "Security group for the local monitoring environment" \
+  --vpc-id <VPC_ID>
+```
+
+Inspect the resources:
+
+```bash
+aws --endpoint-url http://localhost:4566 ec2 describe-vpcs
+aws --endpoint-url http://localhost:4566 ec2 describe-subnets
+aws --endpoint-url http://localhost:4566 ec2 describe-security-groups
+aws --endpoint-url http://localhost:4566 ec2 describe-instances
+```
+
+Record the resource IDs returned by the emulator and use the appropriate IDs when configuring the instance.
+
+### 6.4. EC2 Instance and SSH Access
+
+The Linux environment is used to run Nginx and Node Exporter. SSH access is forwarded through local port `2200`, allowing the macOS host to connect to the simulated environment through `127.0.0.1`.
+
+The SSH connection used by this project is:
+
+```bash
+ssh -i ~/devops-local-key.pem \
+  -p 2200 \
+  -o IdentitiesOnly=yes \
+  root@127.0.0.1
+```
+
+The connection assumes that the instance environment and its SSH service are already running and that the local port forwarding or container port mapping is configured correctly.
+
+The address `127.0.0.1` is a loopback address. It is used here to access the local environment and is not a public Internet IP address.
+
+### 6.5. Networking and Emulator Limitations
+
+A local AWS-compatible emulator may not implement every networking feature in exactly the same way as AWS. The existence of a VPC, subnet, security group, or EC2 instance in the emulator does not by itself guarantee real-world network connectivity.
+
+The monitoring workflow relies on the local SSH connection and the port mappings described in the SSH Tunnels section.
+
 ## 7. SSH Tunnels
 
 The tunnels must remain open while Prometheus needs to reach the corresponding services.
@@ -320,101 +417,4 @@ cd ..
 ---
 
 This project demonstrates a local DevOps workflow combining infrastructure configuration, automated validation, monitoring, observability, availability testing, and version control.
-
-## 6. Local AWS Environment and EC2 Infrastructure
-
-The project uses a local AWS-compatible environment to simulate infrastructure resources and provide a Linux environment for the monitoring components. It is intended for development and testing rather than deployment to a public AWS account.
-
-### 6.1. Start and Verify the Local Environment
-
-The local AWS-compatible API is expected to be available at:
-
-`http://localhost:4566`
-
-Check the running Docker containers:
-
-```bash
-docker ps
-```
-
-Verify that the local AWS-compatible API is reachable:
-
-```bash
-curl http://localhost:4566
-```
-
-The exact response depends on the emulator and the endpoint being queried.
-
-### 6.2. EC2 Networking Resources
-
-The EC2 networking configuration consists of the following AWS resources:
-
-- **VPC:** Provides the virtual network boundary for the simulated EC2 environment.
-- **Subnet:** Defines an IP address range within the VPC where the instance can be placed.
-- **Security Group:** Defines the permitted inbound and outbound traffic for the instance.
-- **EC2 Instance:** Represents the Linux environment used to host the monitored services.
-
-These resources must be configured consistently so that the instance is associated with the intended network and security group.
-
-### 6.3. Create and Inspect Networking Resources
-
-The following AWS CLI commands illustrate the resource-creation workflow for an AWS-compatible local endpoint. They are examples and should only be used if the corresponding resources have not already been created.
-
-Create a VPC:
-
-```bash
-aws --endpoint-url http://localhost:4566 ec2 create-vpc \
-  --cidr-block 10.0.0.0/16
-```
-
-Create a subnet using the returned VPC ID:
-
-```bash
-aws --endpoint-url http://localhost:4566 ec2 create-subnet \
-  --vpc-id <VPC_ID> \
-  --cidr-block 10.0.1.0/24
-```
-
-Create a security group:
-
-```bash
-aws --endpoint-url http://localhost:4566 ec2 create-security-group \
-  --group-name devops-monitoring-sg \
-  --description "Security group for the local monitoring environment" \
-  --vpc-id <VPC_ID>
-```
-
-Inspect the resources:
-
-```bash
-aws --endpoint-url http://localhost:4566 ec2 describe-vpcs
-aws --endpoint-url http://localhost:4566 ec2 describe-subnets
-aws --endpoint-url http://localhost:4566 ec2 describe-security-groups
-aws --endpoint-url http://localhost:4566 ec2 describe-instances
-```
-
-Record the resource IDs returned by the emulator and use the appropriate IDs when configuring the instance.
-
-### 6.4. EC2 Instance and SSH Access
-
-The Linux environment is used to run Nginx and Node Exporter. SSH access is forwarded through local port `2200`, allowing the macOS host to connect to the simulated environment through `127.0.0.1`.
-
-The SSH connection used by this project is:
-
-```bash
-ssh -i ~/devops-local-key.pem \
-  -p 2200 \
-  -o IdentitiesOnly=yes \
-  root@127.0.0.1
-```
-
-The connection assumes that the instance environment and its SSH service are already running and that the local port forwarding or container port mapping is configured correctly.
-
-The address `127.0.0.1` is a loopback address. It is used here to access the local environment and is not a public Internet IP address.
-
-### 6.5. Networking and Emulator Limitations
-
-A local AWS-compatible emulator may not implement every networking feature in exactly the same way as AWS. The existence of a VPC, subnet, security group, or EC2 instance in the emulator does not by itself guarantee real-world network connectivity.
-
-The monitoring workflow relies on the local SSH connection and the port mappings described in the SSH Tunnels section.
 
