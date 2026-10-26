@@ -81,36 +81,6 @@ These addresses are for the local development environment and are not public ser
 - SSH access to the simulated Linux environment
 - Nginx and Node Exporter installed in that environment
 
-## 6. Starting the Monitoring Stack
-
-Run the following commands from the repository root.
-
-Start Prometheus, Grafana, and Blackbox Exporter:
-
-```bash
-docker compose -f monitoring/docker-compose.yml up -d
-```
-
-Check container status:
-
-```bash
-docker compose -f monitoring/docker-compose.yml ps
-```
-
-View logs:
-
-```bash
-docker compose -f monitoring/docker-compose.yml logs
-```
-
-Stop the monitoring stack:
-
-```bash
-docker compose -f monitoring/docker-compose.yml down
-```
-
-The standard `down` command preserves named data volumes. Avoid adding `-v` unless you intentionally want to remove the stored Prometheus and Grafana data.
-
 ## 6. Local AWS Environment and EC2 Infrastructure
 
 The project uses a local AWS-compatible environment to simulate infrastructure resources and provide a Linux environment for the monitoring components. It is intended for development and testing rather than deployment to a public AWS account.
@@ -208,7 +178,37 @@ A local AWS-compatible emulator may not implement every networking feature in ex
 
 The monitoring workflow relies on the local SSH connection and the port mappings described in the SSH Tunnels section.
 
-## 7. SSH Tunnels
+## 7. Starting the Monitoring Stack
+
+Run the following commands from the repository root.
+
+Start Prometheus, Grafana, and Blackbox Exporter:
+
+```bash
+docker compose -f monitoring/docker-compose.yml up -d
+```
+
+Check container status:
+
+```bash
+docker compose -f monitoring/docker-compose.yml ps
+```
+
+View logs:
+
+```bash
+docker compose -f monitoring/docker-compose.yml logs
+```
+
+Stop the monitoring stack:
+
+```bash
+docker compose -f monitoring/docker-compose.yml down
+```
+
+The standard `down` command preserves named data volumes. Avoid adding `-v` unless you intentionally want to remove the stored Prometheus and Grafana data.
+
+## 8. SSH Tunnels
 
 The tunnels must remain open while Prometheus needs to reach the corresponding services.
 
@@ -243,7 +243,7 @@ Prometheus reaches Node Exporter through `host.docker.internal:19100`.
 
 The private key is referenced locally and must not be committed to the repository.
 
-## 8. Terraform Configuration and Validation
+## 9. Terraform Configuration and Validation
 
 The Terraform configuration is located in `terraform/main.tf`. The provider is configured for a local AWS-compatible API endpoint rather than a public AWS endpoint.
 
@@ -270,7 +270,7 @@ Review the plan before performing any infrastructure-changing operation. Validat
 
 The configuration has been checked successfully with `terraform fmt -check` and `terraform validate`.
 
-## 9. Continuous Integration
+## 10. Continuous Integration
 
 The workflow in `.github/workflows/terraform.yml` automates Terraform checks through GitHub Actions.
 
@@ -417,4 +417,3 @@ cd ..
 ---
 
 This project demonstrates a local DevOps workflow combining infrastructure configuration, automated validation, monitoring, observability, availability testing, and version control.
-
